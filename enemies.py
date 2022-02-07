@@ -1,4 +1,3 @@
-from main import *
 from pyganim import *
 from pygame import *
 

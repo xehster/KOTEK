@@ -3,7 +3,8 @@ import enemies
 from main import *
 from pygame import *
 import pyganim
-from bullet import *
+import pygame
+#from bullet import *
 
 CHAR_SPEED = 15
 CHAR_JUMP_POWER = 30
@@ -28,7 +29,8 @@ ANIM_JUMP_RIGHT = ['images/j_r.png']
 ANIM_JUMP_LEFT = ['images/j_l.png']
 ANIM_STAY = ['images/idle_1.png', 'images/idle_2.png', 'images/idle_3.png', 'images/idle_4.png']
 SIMPLE_SHOT_IMG = pygame.image.load('images/bullet.png')
-
+ANIM_SHOOTING_RIGHT = ['images/attackr.png']
+ANIM_SHOOTING_LEFT = ['images/attackl.png']
 
 class Player(sprite.Sprite):
     def __init__(self, x, y):
@@ -41,7 +43,9 @@ class Player(sprite.Sprite):
         self.image = char_idle_static
         self.rect = Rect(x, y, CHAR_WIDTH, CHAR_HEIGHT)
         self.image.set_colorkey(Color(CHAR_COLOR))  # makes bg transparent
-
+        self.direction = 'RIGHT'
+        self.attacking = False
+        self.attack_frame = 0
         # right animation
 
         Anim = []
@@ -89,7 +93,16 @@ class Player(sprite.Sprite):
         self.AnimJump = pyganim.PygAnimation(ANIM_JUMP)
         self.AnimJump.play()
 
-    def update(self, left, right, up, running, platforms, shooting):
+        # shooting anim
+
+        self.AnimShootingRight = pyganim.PygAnimation(ANIM_SHOOTING_RIGHT)
+        self.AnimShootingRight.play()
+
+        self.AnimShootingLeft = pyganim.PygAnimation(ANIM_SHOOTING_LEFT)
+        self.AnimShootingLeft.play()
+
+
+    def update(self, left, right, up, running, platforms, attacking):
         if up:
             if self.onGround:
                 self.vel_y = -CHAR_JUMP_POWER  # character can jump only while on ground
@@ -99,40 +112,52 @@ class Player(sprite.Sprite):
                 self.AnimJump.blit(self.image, (0, 0))
 
         if left:
+            self.direction = "LEFT"
             self.vel_x = -CHAR_SPEED
             self.image.fill(Color(CHAR_COLOR))
             if running:
                 self.vel_x -= CHAR_MOVE_ACC  # acceleration
                 if not up:  # and not jumping
                     self.AnimLeftTurbo.blit(self.image, (0, 0))  # anim acc
+            if self.attacking:
+                self.AnimShootingLeft.blit(self.image, (0, 0))
             if up:  # if jumping
                 self.AnimJumpLeft.blit(self.image, (0, 0))
-            else:  # if not running
+            if not up and not running:  # if not running
                 self.AnimLeft.blit(self.image, (0, 0))
                 if not up:  # and not jumping
                     self.AnimLeft.blit(self.image, (0, 0))
 
         if right:
+            self.direction = "RIGHT"
             self.vel_x = CHAR_SPEED
             self.image.fill(Color(CHAR_COLOR))
-            if shooting:
-                self.shoot()
+
             if running:
                 self.vel_x += CHAR_MOVE_ACC
                 if not up:
                     self.AnimRightTurbo.blit(self.image, (0, 0))
+            if self.attacking:
+                self.AnimShootingRight.blit(self.image, (0, 0))
             if up:
                 self.AnimJumpRight.blit(self.image, (0, 0))
-            else:
+            if not up and not running:
                 self.AnimRight.blit(self.image, (0, 0))
                 if not up:
                     self.AnimRight.blit(self.image, (0, 0))
 
-        if not (left or right):
+        if not (left or right or attacking):
             self.vel_x = 0
             if not up:
-                self.image.fill(Color(CHAR_COLOR))
-                self.AnimStay.blit(self.image, (0, 0))
+                if not self.attacking:
+                    self.image.fill(Color(CHAR_COLOR))
+                    self.AnimStay.blit(self.image, (0, 0))
+        if self.attacking:
+            if self.direction == "RIGHT":
+                self.AnimShootingRight.blit(self.image, (0, 0))
+            if self.direction == "LEFT":
+                self.AnimShootingLeft.blit(self.image, (0, 0))
+
 
         if not self.onGround:
             self.vel_y += GRAVITY
@@ -176,9 +201,15 @@ class Player(sprite.Sprite):
         self.rect.x = go_x
         self.rect.y = go_y
 
-    def shoot(self):
-        bullet = Bullet(self.rect.centerx, self.rect.top)
-        entities.add(bullet)
-        platforms.append(bullet)
+    def attack(self):
+        if self.attack_frame > 10:
+            self.attack_frame = 0
+            self.attacking = False
+        self.attack_frame += 1
+
+
+
+
+
 
 

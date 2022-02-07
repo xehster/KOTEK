@@ -1,5 +1,5 @@
 from pygame import *
-from main import *
+
 
 PLAT_WIDTH = 50
 PLAT_HEIGHT = 50

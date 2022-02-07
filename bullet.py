@@ -1,18 +1,28 @@
 from main import *
+import pygame
 
-class Bullet(pygame.sprite.Sprite):
-    def __init__(self, x, y):
+
+class FireBall(pygame.sprite.Sprite):
+    def __init__(self, direction, x, y):
         super().__init__()
-        self.image = pygame.image.load('images/bullet.png')
+        self.direction = direction
+        if self.direction == "RIGHT":
+            self.image = pygame.image.load('images/bullet.png')
+        else:
+            self.image = pygame.image.load('images/bullet.png')
         self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y + 50
 
-        # bullet position is according the player position
-        self.rect.centerx = x
-        self.rect.bottom = y
-        self.speedy = -15
+    def fire(self, screentoblit):
+        if self.direction == "RIGHT":
+            self.image = pygame.image.load("images/bullet.png")
+            screentoblit.blit(self.image, self.rect)
+        else:
+            self.image = pygame.image.load("images/bullet.png")
+            screentoblit.blit(self.image, self.rect)
 
-    def update(self):
-        self.rect.y += self.speedy
-
-        if self.rect.bottom < 35:
-            self.kill()
+        if self.direction == "RIGHT":
+            self.rect.move_ip(12, 0)
+        else:
+            self.rect.move_ip(-12, 0)

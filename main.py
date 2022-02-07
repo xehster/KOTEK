@@ -4,8 +4,9 @@ from player import *
 from blocks import *
 from pyganim import *
 from enemies import *
-from random import *
+from random import randint
 from bullet import *
+import pygame
 import sys
 
 WIN_WIDTH = 1920
@@ -13,11 +14,10 @@ WIN_HEIGHT = 1080
 DISPLAY = (WIN_WIDTH, WIN_HEIGHT)
 BG_IMG = pygame.image.load('images/bg.png')
 RUNNING = True
-
+screen = pygame.display.set_mode(DISPLAY)
 
 def main():
     pygame.init()
-    screen = pygame.display.set_mode(DISPLAY)
     pygame.display.set_caption('KOTEK')
     FPS = pygame.time.Clock()
 
@@ -25,15 +25,16 @@ def main():
     total_level_height = len(level) * PLAT_HEIGHT  # same but with height
 
     camera = Camera(camera_configure, total_level_width, total_level_height)
-
+    attacking = False
     running = False  # not running by default
     hero = Player(55, 55)  # creating character by these coords
     enm = Enemy(randint(300, 1920), randint(300, 1080), 2, 3, 150, 15)
     left = right = False  # not walking by default
     up = False  # not jumping by default
-    shooting = False
+
 
     while RUNNING:
+
         entities = pygame.sprite.Group()  # all objects sprite group
         entities.add(hero)
         entities.add(enm)
@@ -43,8 +44,10 @@ def main():
 
         bullets = pygame.sprite.Group()  # all bullets
 
-        enemies = pygame.sprite.Group()  # all animated moving deadly creatures
-        enemies.add(enm)
+        villains = pygame.sprite.Group()  # all animated moving deadly creatures
+        villains.add(enm)
+
+        fireballs = pygame.sprite.Group()
 
         x = y = 0
 
@@ -74,9 +77,15 @@ def main():
                 running = False
 
             if e.type == KEYDOWN and e.key == K_SPACE:
-                shooting = True
+                hero.attacking = True
+                fireball = FireBall(hero.direction, hero.rect.x, hero.rect.y)
+                fireballs.add(fireball)
+                platforms.append(fireball)
+                for ball in fireballs:
+                    ball.fire(screen)
+
             if e.type == KEYUP and e.key == K_SPACE:
-                shooting = False
+                hero.attacking = False
 
         for row in level:
             for column in row:
@@ -104,12 +113,20 @@ def main():
             y += PLAT_HEIGHT
             x = 0
 
-        hero.update(left, right, up, running, platforms, shooting)
-        enemies.update(platforms)
+        f = pygame.font.SysFont("arial.ttf", 100)
+        g = f.render(str(hero.rect.right), True, (123, 255, 0))
+        screen.blit(g, (100, 100))
+        fireballs.update()
+        hero.update(left, right, up, running, platforms, attacking)
+        villains.update(platforms)
         FPS.tick(60)
+        bullets.update()
         camera.update(hero)
+
         for e in entities:
             screen.blit(e.image, camera.apply(e))
+        for ball in fireballs:
+            screen.blit(ball.image, ball.rect)
         pygame.display.update()
 
 
