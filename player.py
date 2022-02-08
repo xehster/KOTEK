@@ -47,6 +47,7 @@ class Player(sprite.Sprite):
         self.direction = 'RIGHT'
         self.attacking = False
         self.attack_frame = 0
+        self.health = 5
         # right animation
 
         Anim = []
@@ -118,7 +119,7 @@ class Player(sprite.Sprite):
         self.AnimMeleeLeft = pyganim.PygAnimation(ANIM_MELEE_LEFT)
         self.AnimMeleeLeft.play()
 
-    def update(self, left, right, up, running, platforms, attacking):
+    def update(self, left, right, up, running, platforms, attacking, health):
         if up:
             if self.onGround:
                 self.vel_y = -CHAR_JUMP_POWER  # character can jump only while on ground
@@ -173,23 +174,22 @@ class Player(sprite.Sprite):
                 self.AnimMeleeLeft.blit(self.image, (0, 0))
             if not up and not running and not attacking:
                 self.AnimRight.blit(self.image, (0, 0))
-                if not up:
-                    self.AnimRight.blit(self.image, (0, 0))
 
         if not (left or right):
             self.vel_x = 0
             if attacking and up:
                 if self.direction == "RIGHT":
-                    self.image.fill(Color(CHAR_COLOR))
                     self.AnimMeleeRight.blit(self.image, (0, 0))
                 else:
-                    self.image.fill(Color(CHAR_COLOR))
                     self.AnimMeleeLeft.blit(self.image, (0, 0))
-            if not up:
+            if not up and not attacking:
                 self.image.fill(Color(CHAR_COLOR))
                 self.AnimStay.blit(self.image, (0, 0))
-                if attacking:
+            if not up and attacking:
+                if self.direction == "LEFT":
                     self.AnimMeleeLeft.blit(self.image, (0, 0))
+                else:
+                    self.AnimMeleeRight.blit(self.image, (0, 0))
         if not self.onGround:
             self.vel_y += GRAVITY
 
@@ -200,6 +200,7 @@ class Player(sprite.Sprite):
 
         self.rect.x += self.vel_x  # moving char using vel
         self.collide(self.vel_x, 0, platforms)
+
 
     def collide(self, vel_x, vel_y, platforms):
         for p in platforms:
@@ -221,8 +222,11 @@ class Player(sprite.Sprite):
                     self.rect.top = p.rect.bottom
                     self.vel_y = 0
 
-                if isinstance(p, blocks.DeadlyBlock): #or isinstance(p, enemies.Enemy):  # char dies if touches deadly block
-                    self.die()
+                if isinstance(p, blocks.DeadlyBlock) or (isinstance(p, enemies.Enemy) and self.attacking == False):  # char dies if touches deadly block
+                    self.health -= 1
+                    if self.health < 1:
+                        self.die()
+                        self.health = 5
 
     def die(self):
         time.wait(500)

@@ -31,6 +31,7 @@ def main():
     left = right = False  # not walking by default
     up = False  # not jumping by default
     enm = Enemy(randint(300, 1920), randint(300, 1080), 2, 3, 150, 15)
+    health = hero.health
 
     while RUNNING:
         entities = pygame.sprite.Group()  # all objects sprite group
@@ -105,13 +106,23 @@ def main():
             y += PLAT_HEIGHT
             x = 0
 
-        hero.update(left, right, up, running, platforms, attacking)
+        hero.update(left, right, up, running, platforms, attacking, health)
         villains.update(platforms, playergroup, attacking)
         FPS.tick(60)
         camera.update(hero)
 
         for e in entities:
             screen.blit(e.image, camera.apply(e))
+        if hero.health == 5:
+            screen.blit(pygame.image.load('images/fullhp.png'), (50, 950))
+        elif hero.health == 4:
+            screen.blit(pygame.image.load('images/4hp.png'), (50, 950))
+        elif hero.health == 3:
+            screen.blit(pygame.image.load('images/3hp.png'), (50, 950))
+        elif hero.health == 2:
+            screen.blit(pygame.image.load('images/2hp.png'), (50, 950))
+        else:
+            screen.blit(pygame.image.load('images/1hp.png'), (50, 950))
         pygame.display.update()
 
 

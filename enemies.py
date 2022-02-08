@@ -41,9 +41,6 @@ class Enemy(sprite.Sprite):
 
         if hits and attacking:
             self.kill()
-            f = pygame.font.SysFont("arial.ttf", 100)
-            g = f.render(str('ENEMYKILLED'), True, (123, 255, 0))
-            screen.blit(g, (100, 100))
 
 
         if abs(self.start_x - self.rect.x) > self.pathlenght_x:  # if the enemy passed their full path then they have to go back
