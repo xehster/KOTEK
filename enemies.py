@@ -1,5 +1,6 @@
 from pyganim import *
 from pygame import *
+from main import*
 
 ENEMY_WIDTH = 60
 ENEMY_HEIGHT = 60
@@ -28,7 +29,7 @@ class Enemy(sprite.Sprite):
         self.Anim = PygAnimation(Anim)
         self.Anim.play()
 
-    def update(self, platforms):
+    def update(self, platforms, playergroup, attacking):
         #self.image.fill(Color(ENEMY_COLOR))
         self.Anim.blit(self.image, (0, 0))
 
@@ -36,6 +37,14 @@ class Enemy(sprite.Sprite):
         self.rect.x += self.vel_x
 
         self.collide(platforms)
+        hits = pygame.sprite.spritecollide(self, playergroup, False)
+
+        if hits and attacking:
+            self.kill()
+            f = pygame.font.SysFont("arial.ttf", 100)
+            g = f.render(str('ENEMYKILLED'), True, (123, 255, 0))
+            screen.blit(g, (100, 100))
+
 
         if abs(self.start_x - self.rect.x) > self.pathlenght_x:  # if the enemy passed their full path then they have to go back
             self.vel_x = - self.vel_x
@@ -47,3 +56,5 @@ class Enemy(sprite.Sprite):
             if sprite.collide_rect(self, p) and self != p:  # if collide - go back
                 self.vel_x = - self.vel_x
                 self.vel_y = - self.vel_y
+
+
