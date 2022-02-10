@@ -34,15 +34,15 @@ ANIM_MELEE_LEFT = ['images/melee_l_1.png', 'images/melee_l_2.png', 'images/melee
 ANIM_MELEE_RIGHT = ['images/melee_r_1.png', 'images/melee_r_2.png', 'images/melee_r_3.png', 'images/melee_r_4.png']
 
 class Player(sprite.Sprite):
-    def __init__(self, x, y):
+    def __init__(self):
         sprite.Sprite.__init__(self)
         self.vel_x = 0  # velocity, 0 = idle
         self.vel_y = 0  # same but vertical
-        self.start_x = x  # default position after restart
-        self.start_y = y  # same but vertical
+        self.start_x = 55  # default position after restart
+        self.start_y = 1000  # same but vertical
         self.onGround = False  # is char stands on a solid ground?
         self.image = char_idle_static
-        self.rect = Rect(x, y, CHAR_WIDTH, CHAR_HEIGHT)
+        self.rect = Rect(self.start_x, self.start_y, CHAR_WIDTH, CHAR_HEIGHT)
         self.image.set_colorkey(Color(CHAR_COLOR))  # makes bg transparent
         self.direction = 'RIGHT'
         self.attacking = False
@@ -132,7 +132,6 @@ class Player(sprite.Sprite):
             if attacking:
                 self.AnimMeleeLeft.blit(self.image, (0, 0))
 
-
         if left:
             self.direction = "LEFT"
             self.vel_x = -CHAR_SPEED
@@ -196,13 +195,12 @@ class Player(sprite.Sprite):
         self.onGround = False  # dunno if the char is on the ground
 
         self.rect.y += self.vel_y
-        self.collide(0, self.vel_y, platforms)
+        self.collide(0, self.vel_y, platforms, attacking)
 
         self.rect.x += self.vel_x  # moving char using vel
-        self.collide(self.vel_x, 0, platforms)
+        self.collide(self.vel_x, 0, platforms, attacking)
 
-
-    def collide(self, vel_x, vel_y, platforms):
+    def collide(self, vel_x, vel_y, platforms, attacking):
         for p in platforms:
 
             if sprite.collide_rect(self, p):  # if character meets platform
@@ -222,18 +220,22 @@ class Player(sprite.Sprite):
                     self.rect.top = p.rect.bottom
                     self.vel_y = 0
 
-                if isinstance(p, blocks.DeadlyBlock) or (isinstance(p, enemies.Enemy) and self.attacking == False):  # char dies if touches deadly block
-                    self.health -= 1
+                if isinstance(p, blocks.DeadlyBlock) or isinstance(p, enemies.Enemy):  # char dies if touches deadly block
+                    if not attacking:
+                        self.health -= 1
                     if self.health < 1:
                         self.die()
                         self.health = 5
 
     def die(self):
         time.wait(500)
-        self.teleport(self.start_x, self.start_y)  # teleports to default coords
+        self.teleport(55, 1000)  # teleports to default coords
 
     def teleport(self, go_x, go_y):
         self.rect.x = go_x
         self.rect.y = go_y
 
+
+hero = Player()
+health = hero.health
 

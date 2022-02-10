@@ -28,6 +28,7 @@ class LongPlatform(sprite.Sprite):
         self.image = PLAT_IMG_4
         self.rect = Rect(x, y, PLAT_WIDTH + 150, PLAT_HEIGHT - 30)
 
+
 class VeryLongPlatform(sprite.Sprite):
     def __init__(self, x, y):
         sprite.Sprite.__init__(self)

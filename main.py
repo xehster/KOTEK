@@ -25,28 +25,24 @@ def main():
     total_level_height = len(level) * PLAT_HEIGHT  # same but with height
 
     camera = Camera(camera_configure, total_level_width, total_level_height)
-    attacking = False
+    attacking = hero.attacking
     running = False  # not running by default
-    hero = Player(55, 55)  # creating character by these coords
     left = right = False  # not walking by default
     up = False  # not jumping by default
-    enm = Enemy(randint(300, 1920), randint(300, 1080), 2, 3, 150, 15)
-    health = hero.health
+    enemies = pygame.sprite.Group()  # for enemies (to move them)
+    enemies.add(enm)
 
     while RUNNING:
         entities = pygame.sprite.Group()  # all objects sprite group
         platforms = []  # hard objects
-        villains = pygame.sprite.Group()  # all animated moving deadly creatures
-
-        entities.add(hero)
-        entities.add(enm)
-
-        playergroup = pygame.sprite.Group()
-        playergroup.add(hero)
-
+        herogroup = pygame.sprite.Group()  # main char group
+        herogroup.add(hero)  # to configure collision and update
+        entities.add(hero)  # to blitw
+        #entities.add(enm)  # to blit
         platforms.append(enm)
 
-        villains.add(enm)
+        if enm not in enemies:
+            platforms.remove(enm)
 
         x = y = 0
 
@@ -106,24 +102,52 @@ def main():
             y += PLAT_HEIGHT
             x = 0
 
-        hero.update(left, right, up, running, platforms, attacking, health)
-        villains.update(platforms, playergroup, attacking)
-        FPS.tick(60)
-        camera.update(hero)
+        enemies.update(herogroup, attacking)
+        herogroup.update(left, right, up, running, platforms, attacking, health)
+
+        # gamedev assistance data
+
+        f = pygame.font.SysFont(None, 50)
+        g = f.render((str(enm.hp)), True, (123, 255, 0))
+        screen.blit(g, (100, 100))
+
+
+        # moving all mobs
+
+        for en in enemies:
+            en.move()
+
+        # updating every sprite image
 
         for e in entities:
             screen.blit(e.image, camera.apply(e))
+
+        for enem in enemies:
+            screen.blit(enem.image, camera.apply(enem))
+
+        #  hp visual update
+
         if hero.health == 5:
-            screen.blit(pygame.image.load('images/fullhp.png'), (50, 950))
+            screen.blit(pygame.image.load('images/fullhp.png'), (50, 980))
         elif hero.health == 4:
-            screen.blit(pygame.image.load('images/4hp.png'), (50, 950))
+            screen.blit(pygame.image.load('images/4hp.png'), (50, 980))
         elif hero.health == 3:
-            screen.blit(pygame.image.load('images/3hp.png'), (50, 950))
+            screen.blit(pygame.image.load('images/3hp.png'), (50, 980))
         elif hero.health == 2:
-            screen.blit(pygame.image.load('images/2hp.png'), (50, 950))
+            screen.blit(pygame.image.load('images/2hp.png'), (50, 980))
         else:
-            screen.blit(pygame.image.load('images/1hp.png'), (50, 950))
+            screen.blit(pygame.image.load('images/1hp.png'), (50, 980))
+
+        if enm.hp == 3:
+            screen.blit(pygame.image.load('images/3hp.png'), (50, 900))
+        elif enm.hp == 2:
+            screen.blit(pygame.image.load('images/2hp.png'), (50, 900))
+        elif enm.hp == 1:
+            screen.blit(pygame.image.load('images/1hp.png'), (50, 900))
+        FPS.tick(60)
+        camera.update(hero)
         pygame.display.update()
+
 
 
 class Camera(object):

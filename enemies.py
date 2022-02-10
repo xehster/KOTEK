@@ -1,6 +1,9 @@
-from pyganim import *
+import pyganim
+import pygame
 from pygame import *
 from main import*
+import random
+
 
 ENEMY_WIDTH = 60
 ENEMY_HEIGHT = 60
@@ -10,48 +13,63 @@ ENEMY_IMG = pygame.image.load("images/CRYING_EYEBALL_1.png")
 ENEMY_ANIM_DELAY = 100
 ENEMY_ANIM = ["images/CRYING_EYEBALL_1.png", "images/CRYING_EYEBALL_2.png", "images/CRYING_EYEBALL_3.png", "images/CRYING_EYEBALL_4.png", 'images/CRYING_EYEBALL_5.png']
 
+vec = Vector2
+
+
+
 class Enemy(sprite.Sprite):
-    def __init__(self, x, y, vel_x, vel_y, pathlength_x, pathlenght_y):  # coords, enemy's velocity x/y, and how far enemy can go one way in x or y
+    def __init__(self):
         sprite.Sprite.__init__(self)
         self.image = ENEMY_IMG
-        #self.image.fill(Color(ENEMY_COLOR))
-        self.rect = Rect(x, y, ENEMY_WIDTH, ENEMY_HEIGHT)
-        self.image.set_colorkey(Color(ENEMY_COLOR))
-        self.start_x = x
-        self.start_y = y
-        self.pathlenght_x = pathlength_x
-        self.pathlenght_y = pathlenght_y
-        self.vel_x = vel_x  # 0 = enemy stops
-        self.vel_y = vel_y  # same but vertical
-        Anim = []
-        for anim in ENEMY_ANIM:
-            Anim.append((anim, ENEMY_ANIM_DELAY))
-        self.Anim = PygAnimation(Anim)
-        self.Anim.play()
+        self.rect = Rect((30, 30), (ENEMY_WIDTH, ENEMY_HEIGHT))
+        self.pos = vec(0, 0)
+        self.vel = vec(0, 0)
+        self.direction = randint(0, 1)  # 0 for Right, 1 for Left
+        self.vel.x = randint(2, 6) / 2  # Randomized velocity of the generated enemy
+        self.hp = 3
+        self.state = "ALIVE"
 
-    def update(self, platforms, playergroup, attacking):
-        #self.image.fill(Color(ENEMY_COLOR))
-        self.Anim.blit(self.image, (0, 0))
+        if self.direction == 0:
+            self.pos.x = 0
+            self.pos.y = 235
+        if self.direction == 1:
+            self.pos.x = 700
+            self.pos.y = 235
 
-        self.rect.y += self.vel_y
-        self.rect.x += self.vel_x
+        enemyAnim = []
+        for enemyanim in ENEMY_ANIM:
+            enemyAnim.append((enemyanim, ENEMY_ANIM_DELAY))
 
-        self.collide(platforms)
-        hits = pygame.sprite.spritecollide(self, playergroup, False)
+        self.enemyAnim = pyganim.PygAnimation(ENEMY_ANIM)
+        self.enemyAnim.play()
 
+
+    def move(self):
+        # Causes the enemy to change directions upon reaching the end of screen
+        if self.pos.x >= (WIN_WIDTH - 20):
+            self.direction = 1
+        elif self.pos.x <= 0:
+            self.direction = 0
+
+        if self.direction == 0:
+            self.pos.x += self.vel.x
+        if self.direction == 1:
+            self.pos.x -= self.vel.x
+
+        self.rect.center = self.pos  # Updates rect
+
+    def update(self, herogroup, attacking):
+        self.enemyAnim.blit(self.image, (0, 0))
+        hits = pygame.sprite.spritecollide(self, herogroup, False)
+        # Activates upon either of the two expressions being true
         if hits and attacking:
-            self.kill()
+            self.hp -= 1
+            if self.hp < 1:
+                self.state = "DEAD"
+                self.kill()
+                print("Enemy killed")
 
+enm = Enemy()
 
-        if abs(self.start_x - self.rect.x) > self.pathlenght_x:  # if the enemy passed their full path then they have to go back
-            self.vel_x = - self.vel_x
-        if abs(self.start_y - self.rect.y) > self.pathlenght_y:
-            self.vel_y = -self.vel_y
-
-    def collide(self, platforms):
-        for p in platforms:
-            if sprite.collide_rect(self, p) and self != p:  # if collide - go back
-                self.vel_x = - self.vel_x
-                self.vel_y = - self.vel_y
 
 
