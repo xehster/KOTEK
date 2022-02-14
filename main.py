@@ -31,6 +31,7 @@ def main():
     up = False  # not jumping by default
     enemies = pygame.sprite.Group()  # for enemies (to move them)
     enemies.add(enm)
+    heroprojectiles = pygame.sprite.Group()
 
     while RUNNING:
         entities = pygame.sprite.Group()  # all objects sprite group
@@ -40,6 +41,8 @@ def main():
         entities.add(hero)  # to blitw
         #entities.add(enm)  # to blit
         platforms.append(enm)
+
+        fireballs = pygame.sprite.Group()
 
         if enm not in enemies:
             platforms.remove(enm)
@@ -76,6 +79,10 @@ def main():
             if e.type == KEYUP and e.key == K_SPACE:
                 attacking = False
 
+            if e.type == KEYDOWN and e.key == K_f:
+                hero.fireball(heroprojectiles)
+
+
         for row in level:
             for column in row:
                 if column == '-':
@@ -102,28 +109,31 @@ def main():
             y += PLAT_HEIGHT
             x = 0
 
-        enemies.update(herogroup, attacking)
+
+        for projectile in heroprojectiles:
+            projectile.render(screen, camera)
+            projectile.update(enemies, screen)
+            print(projectile.rect)
+        enemies.update(herogroup, heroprojectiles, attacking)
         herogroup.update(left, right, up, running, platforms, attacking, health)
+
 
         # gamedev assistance data
 
-        f = pygame.font.SysFont(None, 50)
-        g = f.render((str(enm.hp)), True, (123, 255, 0))
-        screen.blit(g, (100, 100))
 
 
         # moving all mobs
 
-        for en in enemies:
-            en.move()
 
         # updating every sprite image
+
 
         for e in entities:
             screen.blit(e.image, camera.apply(e))
 
         for enem in enemies:
             screen.blit(enem.image, camera.apply(enem))
+            enem.move()
 
         #  hp visual update
 
@@ -168,7 +178,7 @@ def camera_configure(camera, target_rect):
     l, t = - l + WIN_WIDTH / 2, - t + WIN_HEIGHT / 2
 
     l = min(0, l)  # don't cross left border
-    l = max(-(camera.width - WIN_WIDTH), l)  # same w/ right border
+    l = max(-(camera.width - WIN_WIDTH), l)  # same wf/ right border
     t = min(0, t)  # same w/ top
     t = max(-(camera.height - WIN_HEIGHT), t)  # same w/ bottom
 

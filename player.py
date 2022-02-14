@@ -4,6 +4,7 @@ from main import *
 from pygame import *
 import pyganim
 import pygame
+from pygame import math
 
 
 CHAR_SPEED = 15
@@ -33,16 +34,17 @@ ANIM_SHOOTING_LEFT = ['images/attackl.png']
 ANIM_MELEE_LEFT = ['images/melee_l_1.png', 'images/melee_l_2.png', 'images/melee_l_3.png', 'images/melee_l_4.png']
 ANIM_MELEE_RIGHT = ['images/melee_r_1.png', 'images/melee_r_2.png', 'images/melee_r_3.png', 'images/melee_r_4.png']
 
+vec = pygame.math.Vector2
+
 class Player(sprite.Sprite):
     def __init__(self):
         sprite.Sprite.__init__(self)
         self.vel_x = 0  # velocity, 0 = idle
         self.vel_y = 0  # same but vertical
-        self.start_x = 55  # default position after restart
-        self.start_y = 1000  # same but vertical
         self.onGround = False  # is char stands on a solid ground?
+        self.pos = vec((55, 1000))
         self.image = char_idle_static
-        self.rect = Rect(self.start_x, self.start_y, CHAR_WIDTH, CHAR_HEIGHT)
+        self.rect = Rect(self.pos.x, self.pos.y, CHAR_WIDTH, CHAR_HEIGHT)
         self.image.set_colorkey(Color(CHAR_COLOR))  # makes bg transparent
         self.direction = 'RIGHT'
         self.attacking = False
@@ -235,7 +237,40 @@ class Player(sprite.Sprite):
         self.rect.x = go_x
         self.rect.y = go_y
 
+    def fireball(self, group):
+        fireball = FireBall(self)
+        group.add(fireball)
+
+
 
 hero = Player()
 health = hero.health
 
+
+class FireBall(pygame.sprite.Sprite):
+    def __init__(self, player):
+        super().__init__()
+
+        self.image = None
+        self.direction = player.direction
+        if self.direction == "RIGHT":
+            self.image = pygame.image.load('images/fireball_r.png')
+        elif self.direction == "LEFT":
+            self.image = pygame.image.load('images/fireball_l.png')
+
+        self.rect = self.image.get_rect(center = player.rect.center)
+
+    def render(self, screenie, cam):
+        screenie.blit(self.image, cam.apply(self))
+
+    def update(self, group, screenie):
+
+        hits = pygame.sprite.spritecollideany(self, group)
+        if (self.rect.x - hero.rect.x) < -1000 or (self.rect.x - hero.rect.x) > 1000:
+            self.kill()
+        if hits:
+            self.kill()
+        if self.direction == "RIGHT":
+            self.rect.move_ip(50, 0)
+        elif self.direction == "LEFT":
+            self.rect.move_ip(-50, 0)

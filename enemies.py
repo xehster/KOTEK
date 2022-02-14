@@ -21,7 +21,7 @@ class Enemy(sprite.Sprite):
     def __init__(self):
         sprite.Sprite.__init__(self)
         self.image = ENEMY_IMG
-        self.rect = Rect((30, 30), (ENEMY_WIDTH, ENEMY_HEIGHT))
+        self.rect = self.image.get_rect()
         self.pos = vec(0, 0)
         self.vel = vec(0, 0)
         self.direction = randint(0, 1)  # 0 for Right, 1 for Left
@@ -30,11 +30,11 @@ class Enemy(sprite.Sprite):
         self.state = "ALIVE"
 
         if self.direction == 0:
-            self.pos.x = 0
-            self.pos.y = 235
+            self.pos.x = 150
+            self.pos.y = 500
         if self.direction == 1:
             self.pos.x = 700
-            self.pos.y = 235
+            self.pos.y = 500
 
         enemyAnim = []
         for enemyanim in ENEMY_ANIM:
@@ -58,11 +58,18 @@ class Enemy(sprite.Sprite):
 
         self.rect.center = self.pos  # Updates rect
 
-    def update(self, herogroup, attacking):
+    def update(self, herogroup, projectiles, attacking):
         self.enemyAnim.blit(self.image, (0, 0))
         hits = pygame.sprite.spritecollide(self, herogroup, False)
         # Activates upon either of the two expressions being true
         if hits and attacking:
+            self.hp -= 1
+            if self.hp < 1:
+                self.state = "DEAD"
+                self.kill()
+                print("Enemy killed")
+        projectilehits = pygame.sprite.spritecollide(self, projectiles, False)
+        if projectilehits:
             self.hp -= 1
             if self.hp < 1:
                 self.state = "DEAD"
