@@ -36,3 +36,4 @@ class VeryLongPlatform(sprite.Sprite):
         self.rect = Rect(x, y, PLAT_WIDTH + 350, PLAT_HEIGHT - 30)
 
 
+

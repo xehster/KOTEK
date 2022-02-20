@@ -58,7 +58,7 @@ class Enemy(sprite.Sprite):
 
         self.rect.center = self.pos  # Updates rect
 
-    def update(self, herogroup, projectiles, attacking):
+    def update(self, herogroup, projectiles, attacking, kitties):
         self.enemyAnim.blit(self.image, (0, 0))
         hits = pygame.sprite.spritecollide(self, herogroup, False)
         # Activates upon either of the two expressions being true
@@ -67,14 +67,28 @@ class Enemy(sprite.Sprite):
             if self.hp < 1:
                 self.state = "DEAD"
                 self.kill()
+                rand_num = randint(0, 100)
+                if rand_num <= 100:
+                    kittie = Kitten()
+                    kitties.add(kittie)
+                    kittie.posx = self.pos.x
+                    kittie.posy = self.pos.y
+
                 print("Enemy killed")
+
         projectilehits = pygame.sprite.spritecollide(self, projectiles, False)
         if projectilehits:
             self.hp -= 1
             if self.hp < 1:
                 self.state = "DEAD"
                 self.kill()
-                print("Enemy killed")
+                rand_num = randint(0, 100)
+                if rand_num <= 100:
+                    kittie = Kitten()
+                    kitties.add(kittie)
+                    kittie.posx = self.pos.x
+                    kittie.posy = self.pos.y
+                print("Enemy killed by projectile")
 
 enm = Enemy()
 

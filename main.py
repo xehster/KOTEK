@@ -7,6 +7,8 @@ from enemies import *
 from random import randint
 import pygame
 import sys
+from Kitties import *
+
 
 WIN_WIDTH = 1920
 WIN_HEIGHT = 1080
@@ -32,6 +34,7 @@ def main():
     enemies = pygame.sprite.Group()  # for enemies (to move them)
     enemies.add(enm)
     heroprojectiles = pygame.sprite.Group()
+    kitties = pygame.sprite.Group()
 
     while RUNNING:
         entities = pygame.sprite.Group()  # all objects sprite group
@@ -41,8 +44,6 @@ def main():
         entities.add(hero)  # to blitw
         #entities.add(enm)  # to blit
         platforms.append(enm)
-
-        fireballs = pygame.sprite.Group()
 
         if enm not in enemies:
             platforms.remove(enm)
@@ -114,7 +115,7 @@ def main():
             projectile.render(screen, camera)
             projectile.update(enemies, screen)
             print(projectile.rect)
-        enemies.update(herogroup, heroprojectiles, attacking)
+        enemies.update(herogroup, heroprojectiles, attacking, kitties)
         herogroup.update(left, right, up, running, platforms, attacking, health)
 
 
@@ -135,8 +136,14 @@ def main():
             screen.blit(enem.image, camera.apply(enem))
             enem.move()
 
+        for kit in kitties:
+            kit.render(screen)
+            kit.update(herogroup, hero)
         #  hp visual update
 
+        score = pygame.font.SysFont(None, 50)
+        scoresurface = score.render(str(hero.score), False, (0, 0, 0))
+        screen.blit(scoresurface, (100, 50))
         if hero.health == 5:
             screen.blit(pygame.image.load('images/fullhp.png'), (50, 980))
         elif hero.health == 4:

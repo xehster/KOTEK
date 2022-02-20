@@ -50,6 +50,7 @@ class Player(sprite.Sprite):
         self.attacking = False
         self.attack_frame = 0
         self.health = 5
+        self.score = 0
         # right animation
 
         Anim = []
