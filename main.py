@@ -13,7 +13,7 @@ from Kitties import *
 WIN_WIDTH = 1920
 WIN_HEIGHT = 1080
 DISPLAY = (WIN_WIDTH, WIN_HEIGHT)
-BG_IMG = pygame.image.load('images/bg.png')
+BG_IMG = pygame.image.load('images/bg_fire.png')
 RUNNING = True
 screen = pygame.display.set_mode(DISPLAY)
 
@@ -96,15 +96,20 @@ def main():
                     entities.add(db)
                     platforms.append(db)
 
-                if column == '=':
-                    platform4 = LongPlatform(x, y)
-                    entities.add(platform4)
-                    platforms.append(platform4)
+                if column == 'b':
+                    bighouse = BigHouse(x, y)
+                    entities.add(bighouse)
+                    platforms.append(bighouse)
 
-                if column == '_':
-                    platform8 = VeryLongPlatform(x, y)
-                    entities.add(platform8)
-                    platforms.append(platform8)
+                if column == 'k':
+                    kiosk = Kiosk(x, y)
+                    entities.add(kiosk)
+                    platforms.append(kiosk)
+
+                if column == 'm':
+                    midhouse = MidHouse(x, y)
+                    entities.add(midhouse)
+                    platforms.append(midhouse)
 
                 x += PLAT_WIDTH
             y += PLAT_HEIGHT
