@@ -127,7 +127,7 @@ class Player(sprite.Sprite):
         self.AnimMeleeLeft = pyganim.PygAnimation(ANIM_MELEE_LEFT)
         self.AnimMeleeLeft.play()
 
-    def update(self, left, right, up, running, platforms, attacking, health):
+    def update(self, left, right, up, running, platforms, attacking, health, down):
         if up:
             if self.onGround:
                 self.vel_y = -CHAR_JUMP_POWER  # character can jump only while on ground
@@ -212,12 +212,12 @@ class Player(sprite.Sprite):
         self.onGround = False  # dunno if the char is on the ground
 
         self.rect.y += self.vel_y
-        self.collide(0, self.vel_y, platforms, attacking)
+        self.collide(0, self.vel_y, platforms, attacking, down)
 
         self.rect.x += self.vel_x  # moving char using vel
-        self.collide(self.vel_x, 0, platforms, attacking)
+        self.collide(self.vel_x, 0, platforms, attacking, down)
 
-    def collide(self, vel_x, vel_y, platforms, attacking):
+    def collide(self, vel_x, vel_y, platforms, attacking, down):
         for p in platforms:
 
             if sprite.collide_rect(self, p):  # if character meets platform
@@ -228,11 +228,14 @@ class Player(sprite.Sprite):
                 if vel_x < 0 and vel_y > 0:
                     self.rect.left = p.rect.right
 
-                if vel_y > 0:
-                    self.rect.bottom = p.rect.top
-                    self.onGround = True
-                    self.vel_y = 0
-
+                if not down:
+                    if vel_y > 0:
+                        self.rect.bottom = p.rect.top
+                        self.onGround = True
+                        self.vel_y = 0
+                if down:
+                    if vel_y > 0:
+                        self.rect.top = p.rect.bottom
                 #if vel_y < 0:
                     #self.rect.top = p.rect.bottom
                     #self.vel_y = 0

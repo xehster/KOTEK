@@ -31,6 +31,7 @@ def main():
     running = False  # not running by default
     left = right = False  # not walking by default
     up = False  # not jumping by default
+    down = False
     enemies = pygame.sprite.Group()  # for enemies (to move them)
     enemies.add(enm)
     heroprojectiles = pygame.sprite.Group()
@@ -67,6 +68,11 @@ def main():
                 up = False
             if e.type == KEYDOWN and e.key == K_w:
                 up = True
+
+            if e.type == KEYDOWN and e.key == K_s:
+                down = True
+            if e.type == KEYUP and e.key == K_s:
+                down = False
 
             if e.type == KEYDOWN and e.key == K_LSHIFT:
                 running = True
@@ -118,6 +124,11 @@ def main():
                     entities.add(hugehouse)
                     platforms.append(hugehouse)
 
+                if column == 'p':
+                    club = Club(x, y)
+                    entities.add(club)
+                    platforms.append(club)
+
                 if column == 'c':
                     car = Car(x, y)
                     entities.add(car)
@@ -131,7 +142,7 @@ def main():
         entities.add(hero)  # to blitw
 
         enemies.update(herogroup, heroprojectiles, attacking, kitties)
-        herogroup.update(left, right, up, running, platforms, attacking, health)
+        herogroup.update(left, right, up, running, platforms, attacking, health, down)
 
 
         # gamedev assistance data
@@ -150,33 +161,31 @@ def main():
         for enem in enemies:
             screen.blit(enem.image, camera.apply(enem))
             enem.move()
-
         for kit in kitties:
-            kit.render(screen)
+            kit.render(screen, camera, enm)
             kit.update(herogroup, hero)
-            #screen.blit(kit.image, camera.apply(kit))
         #  hp visual update
 
         score = pygame.font.SysFont(None, 50)
         scoresurface = score.render(str(hero.score), False, (0, 0, 0))
         screen.blit(scoresurface, (100, 50))
         if hero.health == 5:
-            screen.blit(pygame.image.load('images/fullhp.png'), (50, 980))
+            screen.blit(pygame.image.load('images/fullhp.png'), (50, 960))
         elif hero.health == 4:
-            screen.blit(pygame.image.load('images/4hp.png'), (50, 980))
+            screen.blit(pygame.image.load('images/4hp.png'), (50, 960))
         elif hero.health == 3:
-            screen.blit(pygame.image.load('images/3hp.png'), (50, 980))
+            screen.blit(pygame.image.load('images/3hp.png'), (50, 960))
         elif hero.health == 2:
-            screen.blit(pygame.image.load('images/2hp.png'), (50, 980))
+            screen.blit(pygame.image.load('images/2hp.png'), (50, 960))
         else:
-            screen.blit(pygame.image.load('images/1hp.png'), (50, 980))
+            screen.blit(pygame.image.load('images/1hp.png'), (50, 960))
 
         if enm.hp == 3:
-            screen.blit(pygame.image.load('images/3hp.png'), (50, 900))
+            screen.blit(pygame.image.load('images/fullhpenemy.png'), (camera.apply(enm)))
         elif enm.hp == 2:
-            screen.blit(pygame.image.load('images/2hp.png'), (50, 900))
+            screen.blit(pygame.image.load('images/2hpenemy.png'), (camera.apply(enm)))
         elif enm.hp == 1:
-            screen.blit(pygame.image.load('images/1hp.png'), (50, 900))
+            screen.blit(pygame.image.load('images/1hpenemy.png'), (camera.apply(enm)))
 
         for projectile in heroprojectiles:
             projectile.render(screen, camera)

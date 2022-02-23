@@ -10,10 +10,10 @@ class Kitten(sprite.Sprite):
         self.posx = 0
         self.posy = 0
 
-    def render(self, screenie):
+    def render(self, screenie, cam, enm):
         self.rect.x = self.posx
         self.rect.y = self.posy
-        screenie.blit(self.image, self.rect)
+        screenie.blit(self.image, cam.apply(enm))
 
     def update(self, group, hero):
         hits = sprite.spritecollide(self, group, False)

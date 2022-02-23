@@ -10,6 +10,7 @@ KIOSK = image.load('images/kiosk.png')
 MID_HOUSE = image.load('images/house_painted.png')
 HUGE_HOUSE = image.load('images/huge_house.png')
 CAR_IMAGE = image.load('images/pink_car.png')
+CLUB_IMAGE = image.load('images/club.png')
 
 class Platform(sprite.Sprite):
     def __init__(self, x, y):
@@ -56,6 +57,12 @@ class Car(sprite.Sprite):
     def __init__(self, x, y):
         sprite.Sprite.__init__(self)
         self.image = CAR_IMAGE
+        self.rect = Rect(x, y, PLAT_WIDTH + 150, PLAT_HEIGHT)
+
+class Club(sprite.Sprite):
+    def __init__(self, x, y):
+        sprite.Sprite.__init__(self)
+        self.image = CLUB_IMAGE
         self.rect = Rect(x, y, PLAT_WIDTH + 150, PLAT_HEIGHT)
 
 
