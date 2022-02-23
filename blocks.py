@@ -8,7 +8,8 @@ PLAT_IMG = image.load('images/SHROOM_BLOCK.png')
 BIG_HOUSE = image.load('images/big_house_painted.png')
 KIOSK = image.load('images/kiosk.png')
 MID_HOUSE = image.load('images/house_painted.png')
-
+HUGE_HOUSE = image.load('images/huge_house.png')
+CAR_IMAGE = image.load('images/pink_car.png')
 
 class Platform(sprite.Sprite):
     def __init__(self, x, y):
@@ -42,6 +43,20 @@ class MidHouse(sprite.Sprite):
         sprite.Sprite.__init__(self)
         self.image = MID_HOUSE
         self.rect = Rect(x, y, PLAT_WIDTH + 250, PLAT_HEIGHT)
+
+
+class HugeHouse(sprite.Sprite):
+    def __init__(self, x, y):
+        sprite.Sprite.__init__(self)
+        self.image = HUGE_HOUSE
+        self.rect = Rect(x, y, PLAT_WIDTH + 800, PLAT_HEIGHT)
+
+
+class Car(sprite.Sprite):
+    def __init__(self, x, y):
+        sprite.Sprite.__init__(self)
+        self.image = CAR_IMAGE
+        self.rect = Rect(x, y, PLAT_WIDTH + 150, PLAT_HEIGHT)
 
 
 

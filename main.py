@@ -13,16 +13,16 @@ from Kitties import *
 WIN_WIDTH = 1920
 WIN_HEIGHT = 1080
 DISPLAY = (WIN_WIDTH, WIN_HEIGHT)
-BG_IMG = pygame.image.load('images/bg_fire.png')
+BG_IMG = pygame.image.load('images/testbg.png')
 RUNNING = True
 screen = pygame.display.set_mode(DISPLAY)
+
 
 
 def main():
     pygame.init()
     pygame.display.set_caption('KOTEK')
     FPS = pygame.time.Clock()
-
     total_level_width = len(level[0]) * PLAT_WIDTH  # calcuting level width
     total_level_height = len(level) * PLAT_HEIGHT  # same but with height
 
@@ -40,8 +40,6 @@ def main():
         entities = pygame.sprite.Group()  # all objects sprite group
         platforms = []  # hard objects
         herogroup = pygame.sprite.Group()  # main char group
-        herogroup.add(hero)  # to configure collision and update
-        entities.add(hero)  # to blitw
         #entities.add(enm)  # to blit
         platforms.append(enm)
 
@@ -81,7 +79,11 @@ def main():
                 attacking = False
 
             if e.type == KEYDOWN and e.key == K_f:
+                hero.shooting = True
                 hero.fireball(heroprojectiles)
+
+            if e.type == KEYUP and e.key == K_f:
+                hero.shooting = False
 
 
         for row in level:
@@ -111,15 +113,23 @@ def main():
                     entities.add(midhouse)
                     platforms.append(midhouse)
 
+                if column == 'h':
+                    hugehouse = HugeHouse(x, y)
+                    entities.add(hugehouse)
+                    platforms.append(hugehouse)
+
+                if column == 'c':
+                    car = Car(x, y)
+                    entities.add(car)
+                    platforms.append(car)
+
                 x += PLAT_WIDTH
             y += PLAT_HEIGHT
             x = 0
 
+        herogroup.add(hero)  # to configure collision and update
+        entities.add(hero)  # to blitw
 
-        for projectile in heroprojectiles:
-            projectile.render(screen, camera)
-            projectile.update(enemies, screen)
-            print(projectile.rect)
         enemies.update(herogroup, heroprojectiles, attacking, kitties)
         herogroup.update(left, right, up, running, platforms, attacking, health)
 
@@ -144,6 +154,7 @@ def main():
         for kit in kitties:
             kit.render(screen)
             kit.update(herogroup, hero)
+            #screen.blit(kit.image, camera.apply(kit))
         #  hp visual update
 
         score = pygame.font.SysFont(None, 50)
@@ -166,6 +177,12 @@ def main():
             screen.blit(pygame.image.load('images/2hp.png'), (50, 900))
         elif enm.hp == 1:
             screen.blit(pygame.image.load('images/1hp.png'), (50, 900))
+
+        for projectile in heroprojectiles:
+            projectile.render(screen, camera)
+            projectile.update(enemies, screen)
+            print(projectile.rect)
+
         FPS.tick(60)
         camera.update(hero)
         pygame.display.update()

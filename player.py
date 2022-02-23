@@ -21,6 +21,7 @@ CHAR_COLOR = '#333333'
 char_idle_static = pygame.image.load('images/idle_1.png')
 ANIM_DELAY = 100  # animation change rate
 ANIM_TURBO_DELAY = 50
+ANIM_SHOOTING_DELAY = 50
 
 ANIM_RIGHT = ['images/r_1.png', 'images/r_2.png', 'images/r_3.png', 'images/r_4.png']
 ANIM_LEFT = ['images/l_1.png', 'images/l_2.png', 'images/l_3.png', 'images/l_4.png']
@@ -29,8 +30,8 @@ ANIM_JUMP_RIGHT = ['images/j_r.png']
 ANIM_JUMP_LEFT = ['images/j_l.png']
 ANIM_STAY = ['images/idle_1.png', 'images/idle_2.png', 'images/idle_3.png', 'images/idle_4.png']
 SIMPLE_SHOT_IMG = pygame.image.load('images/bullet.png')
-ANIM_SHOOTING_RIGHT = ['images/attackr.png']
-ANIM_SHOOTING_LEFT = ['images/attackl.png']
+ANIM_SHOOTING_RIGHT = ['images/shooting_r_1.png', 'images/shooting_r_2.png', 'images/shooting_r_3.png', 'images/shooting_r_4.png', 'images/shooting_r_5.png', 'images/shooting_r_6.png', 'images/shooting_r_7.png', 'images/shooting_r_8.png', 'images/shooting_r_9.png', 'images/shooting_r_10.png', 'images/shooting_r_11.png', 'images/shooting_r_12.png', 'images/shooting_r_13.png']
+ANIM_SHOOTING_LEFT = ['images/shooting_l_1.png', 'images/shooting_l_2.png', 'images/shooting_l_3.png', 'images/shooting_l_4.png', 'images/shooting_l_5.png', 'images/shooting_l_6.png', 'images/shooting_l_7.png', 'images/shooting_l_8.png', 'images/shooting_l_9.png', 'images/shooting_l_10.png', 'images/shooting_l_11.png', 'images/shooting_l_12.png', 'images/shooting_l_13.png']
 ANIM_MELEE_LEFT = ['images/melee_l_1.png', 'images/melee_l_2.png', 'images/melee_l_3.png', 'images/melee_l_4.png']
 ANIM_MELEE_RIGHT = ['images/melee_r_1.png', 'images/melee_r_2.png', 'images/melee_r_3.png', 'images/melee_r_4.png']
 
@@ -51,6 +52,7 @@ class Player(sprite.Sprite):
         self.attack_frame = 0
         self.health = 5
         self.score = 0
+        self.shooting = False
         # right animation
 
         Anim = []
@@ -99,12 +101,15 @@ class Player(sprite.Sprite):
         self.AnimJump.play()
 
         # shooting anim right
-
+        Anim = []
+        for anim in ANIM_SHOOTING_RIGHT:
+            Anim.append((anim, ANIM_SHOOTING_DELAY))
         self.AnimShootingRight = pyganim.PygAnimation(ANIM_SHOOTING_RIGHT)
         self.AnimShootingRight.play()
 
         # shooting anim left
-
+        for anim in ANIM_SHOOTING_LEFT:
+            Anim.append((anim, ANIM_SHOOTING_DELAY))
         self.AnimShootingLeft = pyganim.PygAnimation(ANIM_SHOOTING_LEFT)
         self.AnimShootingLeft.play()
 
@@ -130,68 +135,77 @@ class Player(sprite.Sprite):
                     self.vel_y -= CHAR_JUMP_ACC  # then jump power acc
                 self.image.fill(Color(CHAR_COLOR))
                 self.AnimJump.blit(self.image, (0, 0))
-                if attacking:
+                if attacking and not self.shooting:
                     self.AnimMeleeLeft.blit(self.image, (0, 0))
-            if attacking:
+            if attacking and not self.shooting:
                 self.AnimMeleeLeft.blit(self.image, (0, 0))
 
         if left:
             self.direction = "LEFT"
             self.vel_x = -CHAR_SPEED
             self.image.fill(Color(CHAR_COLOR))
-            if attacking and not running and not up:
+            if attacking and not running and not up and not self.shooting:
                 self.AnimMeleeLeft.blit(self.image, (0, 0))
-            if running and not attacking:
+            if running and not attacking and not self.shooting:
                 self.vel_x -= CHAR_MOVE_ACC  # acceleration
                 if not up:  # and not jumping
                     self.AnimLeftTurbo.blit(self.image, (0, 0))  # anim acc
-            if attacking and running:
+            if attacking and running and not self.shooting:
                 self.vel_x -= CHAR_MOVE_ACC
                 self.AnimMeleeLeft.blit(self.image, (0, 0))
-            if up and not attacking:  # if jumping
+            if up and not attacking and not self.shooting:  # if jumping
                 self.AnimJumpLeft.blit(self.image, (0, 0))
-            if attacking and up:
+            if attacking and up and not self.shooting:
                 self.AnimMeleeLeft.blit(self.image, (0, 0))
-            if not up and not running and not attacking:  # if not running
+            if not up and not running and not attacking and not self.shooting:  # if not running
                 self.AnimLeft.blit(self.image, (0, 0))
                 if not up:  # and not jumping
                     self.AnimLeft.blit(self.image, (0, 0))
+            if self.shooting:
+                self.AnimShootingLeft.blit(self.image, (0, 0))
 
         if right:
             self.direction = "RIGHT"
             self.vel_x = CHAR_SPEED
             self.image.fill(Color(CHAR_COLOR))
-            if attacking and not running and not up:
+            if attacking and not running and not up and not self.shooting:
                 self.AnimMeleeRight.blit(self.image, (0, 0))
-            if running and not attacking:
+            if running and not attacking and not self.shooting:
                 self.vel_x += CHAR_MOVE_ACC
-                if not up:
+                if not up and not self.shooting:
                     self.AnimRightTurbo.blit(self.image, (0, 0))
-            if attacking and running:
+            if attacking and running and not self.shooting:
                 self.vel_x += CHAR_MOVE_ACC
                 self.AnimMeleeLeft.blit(self.image, (0, 0))
-            if up and not attacking:
+            if up and not attacking and not self.shooting:
                 self.AnimJumpRight.blit(self.image, (0, 0))
-            if up and attacking:
+            if up and attacking and not self.shooting:
                 self.AnimMeleeLeft.blit(self.image, (0, 0))
-            if not up and not running and not attacking:
+            if not up and not running and not attacking and not self.shooting:
                 self.AnimRight.blit(self.image, (0, 0))
+            if self.shooting:
+                self.AnimShootingRight.blit(self.image, (0, 0))
 
         if not (left or right):
             self.vel_x = 0
-            if attacking and up:
+            if attacking and up and not self.shooting:
                 if self.direction == "RIGHT":
                     self.AnimMeleeRight.blit(self.image, (0, 0))
                 else:
                     self.AnimMeleeLeft.blit(self.image, (0, 0))
-            if not up and not attacking:
+            if not up and not attacking and not self.shooting:
                 self.image.fill(Color(CHAR_COLOR))
                 self.AnimStay.blit(self.image, (0, 0))
-            if not up and attacking:
+            if not up and attacking and not self.shooting:
                 if self.direction == "LEFT":
                     self.AnimMeleeLeft.blit(self.image, (0, 0))
                 else:
                     self.AnimMeleeRight.blit(self.image, (0, 0))
+            if not up and not attacking and self.shooting:
+                if self.direction == "LEFT":
+                    self.AnimShootingLeft.blit(self.image, (0, 0))
+                else:
+                    self.AnimShootingRight.blit(self.image, (0, 0))
         if not self.onGround:
             self.vel_y += GRAVITY
 
@@ -208,10 +222,10 @@ class Player(sprite.Sprite):
 
             if sprite.collide_rect(self, p):  # if character meets platform
 
-                if vel_x > 0:  # if moves to the right
+                if vel_x > 0 and vel_y > 0:  # if moves to the right
                     self.rect.right = p.rect.left  # then doesn't move to the right (meets and stops moving)
 
-                if vel_x < 0:
+                if vel_x < 0 and vel_y > 0:
                     self.rect.left = p.rect.right
 
                 if vel_y > 0:
@@ -219,9 +233,9 @@ class Player(sprite.Sprite):
                     self.onGround = True
                     self.vel_y = 0
 
-                if vel_y < 0:
-                    self.rect.top = p.rect.bottom
-                    self.vel_y = 0
+                #if vel_y < 0:
+                    #self.rect.top = p.rect.bottom
+                    #self.vel_y = 0
 
                 if isinstance(p, blocks.DeadlyBlock) or isinstance(p, enemies.Enemy):  # char dies if touches deadly block
                     if not attacking:
@@ -241,7 +255,6 @@ class Player(sprite.Sprite):
     def fireball(self, group):
         fireball = FireBall(self)
         group.add(fireball)
-
 
 
 hero = Player()
