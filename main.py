@@ -10,8 +10,8 @@ import sys
 from Kitties import *
 
 
-WIN_WIDTH = 1920
-WIN_HEIGHT = 1080
+WIN_WIDTH = 1080
+WIN_HEIGHT = 720
 DISPLAY = (WIN_WIDTH, WIN_HEIGHT)
 BG_IMG = pygame.image.load('images/testbg.png')
 RUNNING = True

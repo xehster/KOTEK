@@ -21,7 +21,7 @@ CHAR_COLOR = '#333333'
 char_idle_static = pygame.image.load('images/idle_1.png')
 ANIM_DELAY = 100  # animation change rate
 ANIM_TURBO_DELAY = 50
-ANIM_SHOOTING_DELAY = 50
+ANIM_SHOOTING_DELAY = 30
 
 ANIM_RIGHT = ['images/r_1.png', 'images/r_2.png', 'images/r_3.png', 'images/r_4.png']
 ANIM_LEFT = ['images/l_1.png', 'images/l_2.png', 'images/l_3.png', 'images/l_4.png']
@@ -36,6 +36,7 @@ ANIM_MELEE_LEFT = ['images/melee_l_1.png', 'images/melee_l_2.png', 'images/melee
 ANIM_MELEE_RIGHT = ['images/melee_r_1.png', 'images/melee_r_2.png', 'images/melee_r_3.png', 'images/melee_r_4.png']
 
 vec = pygame.math.Vector2
+
 
 class Player(sprite.Sprite):
     def __init__(self):
@@ -68,9 +69,6 @@ class Player(sprite.Sprite):
 
         # left animation
 
-        Anim = []
-        AnimTurbo = []
-
         for anim in ANIM_LEFT:
             Anim.append((anim, ANIM_DELAY))
             AnimTurbo.append((anim, ANIM_TURBO_DELAY))
@@ -83,7 +81,6 @@ class Player(sprite.Sprite):
 
         self.AnimStay = pyganim.PygAnimation(ANIM_STAY)
         self.AnimStay.play()
-        self.AnimStay.blit(self.image, (0, 0))  # staying by default
 
         # jump left anim
 
@@ -101,7 +98,6 @@ class Player(sprite.Sprite):
         self.AnimJump.play()
 
         # shooting anim right
-        Anim = []
         for anim in ANIM_SHOOTING_RIGHT:
             Anim.append((anim, ANIM_SHOOTING_DELAY))
         self.AnimShootingRight = pyganim.PygAnimation(ANIM_SHOOTING_RIGHT)
@@ -114,18 +110,17 @@ class Player(sprite.Sprite):
         self.AnimShootingLeft.play()
 
         # melee anim right
-        Anim = []
         for anim in ANIM_MELEE_RIGHT:
             Anim.append((anim, ANIM_DELAY))
         self.AnimMeleeRight = pyganim.PygAnimation(ANIM_MELEE_RIGHT)
         self.AnimMeleeRight.play()
 
         # melee anim left
-        Anim = []
         for anim in ANIM_MELEE_LEFT:
             Anim.append((anim, ANIM_DELAY))
         self.AnimMeleeLeft = pyganim.PygAnimation(ANIM_MELEE_LEFT)
         self.AnimMeleeLeft.play()
+
 
     def update(self, left, right, up, running, platforms, attacking, health, down):
         if up:
@@ -190,21 +185,27 @@ class Player(sprite.Sprite):
             self.vel_x = 0
             if attacking and up and not self.shooting:
                 if self.direction == "RIGHT":
+                    self.image.fill(Color(CHAR_COLOR))
                     self.AnimMeleeRight.blit(self.image, (0, 0))
                 else:
+                    self.image.fill(Color(CHAR_COLOR))
                     self.AnimMeleeLeft.blit(self.image, (0, 0))
             if not up and not attacking and not self.shooting:
                 self.image.fill(Color(CHAR_COLOR))
                 self.AnimStay.blit(self.image, (0, 0))
             if not up and attacking and not self.shooting:
                 if self.direction == "LEFT":
+                    self.image.fill(Color(CHAR_COLOR))
                     self.AnimMeleeLeft.blit(self.image, (0, 0))
                 else:
+                    self.image.fill(Color(CHAR_COLOR))
                     self.AnimMeleeRight.blit(self.image, (0, 0))
             if not up and not attacking and self.shooting:
                 if self.direction == "LEFT":
+                    self.image.fill(Color(CHAR_COLOR))
                     self.AnimShootingLeft.blit(self.image, (0, 0))
                 else:
+                    self.image.fill(Color(CHAR_COLOR))
                     self.AnimShootingRight.blit(self.image, (0, 0))
         if not self.onGround:
             self.vel_y += GRAVITY
